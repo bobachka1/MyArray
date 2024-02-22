@@ -7,20 +7,20 @@ class MyArray
 private:
 	T* _arr;
 	size_t _capacity = 1;
-	size_t _size;
+	size_t _size = 0;
 public:
 	MyArray()
 	{
 		_size = 0;
 		_capacity = 1;
-		_arr = 0;
+		_arr = nullptr;
 	}
 	MyArray(int capacity) : _capacity(capacity) , _size(0)
 	{
 		if (_capacity >= 0)
 			_arr = new T[_capacity]{};
 		else
-			throw std::exception("Wrong capacity");
+			return;
 	}
 	MyArray(const MyArray& arr)
 	{
@@ -37,16 +37,32 @@ public:
 		arr._size = 0;
 		arr._arr = nullptr;
 	}
+	~MyArray() { erase(); }
 	MyArray& operator=(const MyArray& data)
 	{
 		if (&data == this)
 			return *this;
-		resize(data.capacity());
-		return *this;
+		erase();
+		if (data._capacity > 0)
+		{
+			_arr = new T[data._capacity];
+			_size = data._size;
+			_capacity = data._capacity;
+			for (int i = 0; i != _size; ++i)
+			{
+				_arr[i] = data._arr[i];
+			}
+			return *this;
+		}
+		else
+		{
+			erase();
+			return *this;
+		}
 	}
 	MyArray& operator=(MyArray&& data) noexcept
 	{
-		delete[] _arr;
+		erase();
 		_arr = data._arr;
 		_size = data._size;
 		_capacity = data._capacity;
@@ -154,5 +170,4 @@ public:
 	const T* cend() const { return _arr + _size; }
 	T* begin() { return _arr; }
 	T* end() { return _arr + _size; }
-	~MyArray() { delete[] _arr; }
 };
